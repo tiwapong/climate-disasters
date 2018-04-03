@@ -13,7 +13,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "Hello, World!"
+    disaster_types = db.disasters_declarations_data.distinct("incidentType")
+    print("Disaster Types: ", disaster_types)
+    return render_template('index.html', disaster_types=disaster_types)
 
 if __name__ == "__main__":
     app.run()
