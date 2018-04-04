@@ -191,7 +191,6 @@ autocomplete(document.getElementById("inputType"), disasterTypes);
 
 </script>
 
-<!-- <script src="us-states.js"></script> -->
 <script>
   mapboxgl.accessToken = 'pk.eyJ1IjoiY2Fwcmlwb3QiLCJhIjoiY2pjMDJqcDhsMDQ2MzJ4bW85MTR0YXBzYiJ9.Ag9mIZTDONNN9JdN2kW76g';
   var map = new mapboxgl.Map({
@@ -224,12 +223,11 @@ autocomplete(document.getElementById("inputType"), disasterTypes);
     var startDate = document.getElementById('inputStartDate').value;
     var endDate = document.getElementById('inputEndDate').value;
 
-    var posting = $.post("http://localhost:5000", {
+    var posting = $.post("http://67.205.128.216:5000", {
       'disaster': disaster,
       'startDate': startDate,
       'endDate': endDate
     });
-    
     /*
     send a POST request to flask
     returns data, a string representation of parsed

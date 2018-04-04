@@ -3,9 +3,6 @@ from datetime import datetime
 from pymongo import MongoClient
 
 import json
-import geojson
-import pandas as pd
-import csv
 import os
 
 mongo_client = MongoClient("mongodb+srv://gunganit:mongoDBGT@femadataset-hpenl.mongodb.net/test") 
@@ -125,4 +122,4 @@ def after_request(response):
 	return response
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')
