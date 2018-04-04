@@ -3,6 +3,7 @@ from datetime import datetime
 from pymongo import MongoClient
 
 import json
+import geojson
 import pandas as pd
 import csv
 import os
@@ -24,12 +25,104 @@ def inputs_form_submit():
     endDate = request.form['endDate']
     start = datetime.strptime(startDate, "%Y-%m-%d")
     end = datetime.strptime(endDate, "%Y-%m-%d")
-    print("startDateObj: " , start)
-    print("endDateObj: ", end)
-
     states = db.disasters_declarations_data.distinct("state", { "incidentBeginDate": { "$gte": start }, "incidentEndDate": { "$lte": end }, "incidentType": disaster})
-    print("states", states)
-    return "OK"
+
+    states_list = []
+    for state_abr in states:
+        st = get_state_name(state_abr)
+        states_list.append(st)
+    return parse_geoJSON(states_list)
+
+def parse_geoJSON(states_list):
+    data = json.load(open('us-states.json'))
+    features = data['features']
+
+    filtered_features = []
+    for feature in features:
+        if feature['properties']['name'] in states_list:
+            filtered_features.append(feature)
+    filtered_geojson = {}
+    filtered_geojson['type'] = 'FeatureCollection'
+    filtered_geojson['features'] = filtered_features
+
+    return json.dumps(filtered_geojson)
+
+def get_state_name(state_abr):
+    states = [
+        ['Alabama', 'AL'],
+        ['Alaska', 'AK'],
+        ['American Samoa', 'AS'],
+        ['Arizona', 'AZ'],
+        ['Arkansas', 'AR'],
+        ['Armed Forces Americas', 'AA'],
+        ['Armed Forces Europe', 'AE'],
+        ['Armed Forces Pacific', 'AP'],
+        ['California', 'CA'],
+        ['Colorado', 'CO'],
+        ['Connecticut', 'CT'],
+        ['Delaware', 'DE'],
+        ['District Of Columbia', 'DC'],
+        ['Florida', 'FL'],
+        ['Georgia', 'GA'],
+        ['Guam', 'GU'],
+        ['Hawaii', 'HI'],
+        ['Idaho', 'ID'],
+        ['Illinois', 'IL'],
+        ['Indiana', 'IN'],
+        ['Iowa', 'IA'],
+        ['Kansas', 'KS'],
+        ['Kentucky', 'KY'],
+        ['Louisiana', 'LA'],
+        ['Maine', 'ME'],
+        ['Marshall Islands', 'MH'],
+        ['Maryland', 'MD'],
+        ['Massachusetts', 'MA'],
+        ['Michigan', 'MI'],
+        ['Minnesota', 'MN'],
+        ['Mississippi', 'MS'],
+        ['Missouri', 'MO'],
+        ['Montana', 'MT'],
+        ['Nebraska', 'NE'],
+        ['Nevada', 'NV'],
+        ['New Hampshire', 'NH'],
+        ['New Jersey', 'NJ'],
+        ['New Mexico', 'NM'],
+        ['New York', 'NY'],
+        ['North Carolina', 'NC'],
+        ['North Dakota', 'ND'],
+        ['Northern Mariana Islands', 'NP'],
+        ['Ohio', 'OH'],
+        ['Oklahoma', 'OK'],
+        ['Oregon', 'OR'],
+        ['Pennsylvania', 'PA'],
+        ['Puerto Rico', 'PR'],
+        ['Rhode Island', 'RI'],
+        ['South Carolina', 'SC'],
+        ['South Dakota', 'SD'],
+        ['Tennessee', 'TN'],
+        ['Texas', 'TX'],
+        ['US Virgin Islands', 'VI'],
+        ['Utah', 'UT'],
+        ['Vermont', 'VT'],
+        ['Virginia', 'VA'],
+        ['Washington', 'WA'],
+        ['West Virginia', 'WV'],
+        ['Wisconsin', 'WI'],
+        ['Wyoming', 'WY'],
+    ]
+    
+    for st in states:
+        if(st[1] == state_abr):
+            return st[0]
+    return 
+
+@app.after_request
+def after_request(response):
+	response.headers.add('Access-Control-Allow-Origin', '*')
+	response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+	response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+	response.headers.add('Access-Control-Allow-Credentials', 'true')
+	return response
 
 if __name__ == "__main__":
     app.run()

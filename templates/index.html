@@ -55,7 +55,7 @@ input[type=submit] {
   background-color: DodgerBlue !important; 
   color: #ffffff; 
 }
-
+#map { position:absolute; top:150px; bottom:0; width:100%; }
 </style>
 </head>     
 
@@ -65,8 +65,7 @@ input[type=submit] {
 
 <p>Input disaster type and dates</p>
 
-<!--Make sure the form has the autocomplete function switched off:-->
-<form autocomplete="off" method="POST" >
+<form autocomplete="off" action="javascript:addMapLayer()" >
   <span style="float:left; margin-right:20px;"> 
   
   <div class="autocomplete" style="width:300px;">
@@ -81,6 +80,12 @@ input[type=submit] {
   <input id="submitButton" type="submit">
 </span>
 </form>
+
+<div id='map'></div>
+
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <script>
 /* Autocomplete Template from https://www.w3schools.com/howto/howto_js_autocomplete.asp */
@@ -180,31 +185,86 @@ function autocomplete(inp, arr) {
       closeAllLists(e.target);
       });
 }
-/*
-function getInputDates(startInput, endInput){
-  startInput.addEventListener("change", function() {
-        var input = this.value;
-        var date = new Date(input);
-        console.log(input);
-        console.log(date.toUTCString());
-
-    })
-  endInput.addEventListener("change", function() {
-        var input = this.value;
-        var date = new Date(input);
-        console.log(input);
-        console.log(date.toUTCString());
-    })
-}
-*/
-
 var disasterTypes = {{ t|tojson|safe }};
 
 autocomplete(document.getElementById("inputType"), disasterTypes);
-// getInputDates(document.getElementById("inputStartDate"), document.getElementById("inputEndDate"));
-
 
 </script>
 
+<!-- <script src="us-states.js"></script> -->
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoiY2Fwcmlwb3QiLCJhIjoiY2pjMDJqcDhsMDQ2MzJ4bW85MTR0YXBzYiJ9.Ag9mIZTDONNN9JdN2kW76g';
+  var map = new mapboxgl.Map({
+    container: 'map',
+    maxZoom: 5.5,
+    minZoom: 1.8,
+    style: 'mapbox://styles/mapbox/light-v9',
+    center: [-115.36957574368233, 50.732480262447524],
+    zoom: 2.850019725398168
+  });
+
+  map.on('click', 'us-states', function(e) {
+    var coordinates = almostFlatten(e.features[0].geometry.coordinates);
+    var bounds = new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]);
+    coordinates.forEach(function(coord) {
+      bounds.extend(coord);
+    })
+
+    map.fitBounds(bounds, { padding: 100 });
+  });
+
+  function almostFlatten(arr) {
+    return arr.reduce(function (flat, toFlatten) {
+      return flat.concat(Array.isArray(toFlatten[0]) ? almostFlatten(toFlatten) : [toFlatten]);
+    }, []);
+  }
+
+  function addMapLayer(){
+    var disaster = document.getElementById('inputType').value;
+    var startDate = document.getElementById('inputStartDate').value;
+    var endDate = document.getElementById('inputEndDate').value;
+
+    var posting = $.post("http://localhost:5000", {
+      'disaster': disaster,
+      'startDate': startDate,
+      'endDate': endDate
+    });
+    
+    /*
+    send a POST request to flask
+    returns data, a string representation of parsed
+    geojson to be added as a layer in map
+    */
+    posting.done(function( data ){
+
+      if (map.getLayer('disaster-state-layer')) {
+        map.removeLayer('disaster-state-layer');
+        map.removeSource('disaster-state-layer')
+      }
+
+      var layers = map.getStyle().layers;
+      var firstSymbolId;
+      for (var i = 0; i < layers.length; i++) {
+          if (layers[i].type === 'symbol') {
+              firstSymbolId = layers[i].id;
+              break;
+          }
+      }
+
+      var statesLayer = map.addLayer({
+        'id': 'disaster-state-layer',
+        'type': 'fill',
+        'source': {
+          type: 'geojson',
+          data: JSON.parse(data)
+        },
+        'paint': {
+                'fill-color': '#23A4FF',
+                'fill-opacity': 0.75
+          }
+      }, firstSymbolId);
+    });
+  }
+</script>
 </body>
 </html>
