@@ -62,26 +62,25 @@ input[type=submit] {
 <body>
 
 <h2>Climate Disasters</h2>
-
-<p>Input disaster type and dates</p>
+<p>An Interactive Data Visualization Project. Input disaster type, start date, and end date below. </p>
 
 <form autocomplete="off" action="javascript:addMapLayer()" >
   <span style="float:left; margin-right:20px;"> 
   
-  <div class="autocomplete" style="width:300px;">
+  <div class="autocomplete" style="width:30vh;">
     <input id="inputType" type="text" name="disaster" placeholder="Disaster Type e.g. Tornado">
   </div>
-  <div class="autocomplete">
-    <input id="inputStartDate" type="text" name="startDate" placeholder="Start Date" onfocus="(this.type='date')" onblur="(this.type='text')">
+  <div class="autocomplete" style="width:40vh;">
+    <input id="inputStartDate" type="text" name="startDate" placeholder="Start Date (yyyy-mm-dd)" onfocus="(this.type='date')" onblur="(this.type='text')">
   </div>
-  <div class="autocomplete">
-    <input id="inputEndDate" type="text" name="endDate" placeholder="End Date" onfocus="(this.type='date')" onblur="(this.type='text')">
+  <div class="autocomplete" style="width:40vh;">
+    <input id="inputEndDate" type="text" name="endDate" placeholder="End Date (yyyy-mm-dd)" onfocus="(this.type='date')" onblur="(this.type='text')">
   </div>
   <input id="submitButton" type="submit">
+  <div id='map'></div>
 </span>
 </form>
 
-<div id='map'></div>
 
 <script src='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
