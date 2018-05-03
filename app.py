@@ -7,16 +7,14 @@ import os
 
 MONGO_URL = os.environ.get('PROD_MONGODB')
 client = MongoClient(MONGO_URL)
-# mongo_client = MongoClient("mongodb+srv://gunganit:mongoDBGT@femadataset-hpenl.mongodb.net/test") 
-# mongo_client = MongoClient("mongodb+srv://gunganit:mongoDBGT@femadataset-hpenl.mongodb.net:27017/test") 
 db = client.fema
+port = int(os.environ.get("PORT", 5000))
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     disaster_types = db.disasters_declarations_data.distinct("incidentType")
-    port = int(os.environ.get("PORT", 5000))
     return render_template("index.html", t=disaster_types, port=port)
 
 @app.route('/', methods=['POST'])
@@ -126,6 +124,4 @@ def after_request(response):
 	return response
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    # app.run(host='0.0.0.0')
