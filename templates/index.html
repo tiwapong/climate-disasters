@@ -223,7 +223,7 @@ autocomplete(document.getElementById("inputType"), disasterTypes);
     var startDate = document.getElementById('inputStartDate').value;
     var endDate = document.getElementById('inputEndDate').value;
 
-    var posting = $.post("https://0.0.0.0:"+{{port}}, {
+    var posting = $.post("https://climate-disasters.herokuapp.com/", {
       'disaster': disaster,
       'startDate': startDate,
       'endDate': endDate
