@@ -5,8 +5,10 @@ from pymongo import MongoClient
 import json
 import os
 
-mongo_client = MongoClient("mongodb+srv://gunganit:mongoDBGT@femadataset-hpenl.mongodb.net/test") 
-db = mongo_client.fema
+MONGO_URL = os.environ.get('PROD_MONGODB')
+client = MongoClient(MONGO_URL)
+# mongo_client = MongoClient("mongodb+srv://gunganit:mongoDBGT@femadataset-hpenl.mongodb.net/test") 
+db = client.fema
 
 app = Flask(__name__)
 
