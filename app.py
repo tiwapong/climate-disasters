@@ -8,6 +8,7 @@ import os
 MONGO_URL = os.environ.get('PROD_MONGODB')
 client = MongoClient(MONGO_URL)
 # mongo_client = MongoClient("mongodb+srv://gunganit:mongoDBGT@femadataset-hpenl.mongodb.net/test") 
+# mongo_client = MongoClient("mongodb+srv://gunganit:mongoDBGT@femadataset-hpenl.mongodb.net:27017/test") 
 db = client.fema
 
 app = Flask(__name__)
