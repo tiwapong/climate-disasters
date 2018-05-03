@@ -16,7 +16,8 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     disaster_types = db.disasters_declarations_data.distinct("incidentType")
-    return render_template("index.html", t=disaster_types)
+    port = int(os.environ.get("PORT", 5000))
+    return render_template("index.html", t=disaster_types, port=port)
 
 @app.route('/', methods=['POST'])
 def inputs_form_submit():

@@ -223,7 +223,7 @@ autocomplete(document.getElementById("inputType"), disasterTypes);
     var startDate = document.getElementById('inputStartDate').value;
     var endDate = document.getElementById('inputEndDate').value;
 
-    var posting = $.post("http://67.205.128.216:5000", {
+    var posting = $.post("http://0.0.0.0:"+{{port}}, {
       'disaster': disaster,
       'startDate': startDate,
       'endDate': endDate
